@@ -12,7 +12,7 @@ CORS(app)
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'HelloWorld'
 app.config['MYSQL_DB'] = 'student'
-app.config['MYSQL_HOST'] = 'cloud-computing-363308:europe-west2:flask-database'
+app.config['MYSQL_HOST'] = '35.197.236.234'
 mysql.init_app(app)
 
 @app.route("/add") #Add Student
