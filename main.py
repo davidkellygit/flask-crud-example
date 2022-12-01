@@ -15,24 +15,18 @@ app.config['MYSQL_DB'] = 'student'
 app.config['MYSQL_HOST'] = '35.197.236.234'
 mysql.init_app(app)
 
-@app.route("/add") #Add Student
-def add():
-  name = request.args.get('name')
-  email = request.args.get('email')
-  cur = mysql.connection.cursor() #create a connection to the SQL instance
-  s='''INSERT INTO students(studentName, email) VALUES('{}','{}');'''.format(name,email) # kludge - use stored proc or params
-  cur.execute(s)
-  mysql.connection.commit()
+cur = mysql.connection.cursor() #create a connection to the SQL instance
 
-  return '{"Result":"Success"}' # Really? maybe we should check!
+def insert(name,email):
+  s = f"INSERT INTO student(studentName, email) VALUES('{name}','{email}'"
+  try:
+    cur.execute(s)
+    mysql.connection.commit()
+    return '{"Result":"Success"}' # Really? maybe we should check!
+  except:
+    return ('{"Result":"Failure"}')
 
-@app.route("/hello") #Add Student
-def hello():
-  return '{"Result":"Success"}' # Really? maybe we should check!  
-  
-@app.route("/") #Default - Show Data
-def read(): # Name of the method
-  cur = mysql.connection.cursor() #create a connection to the SQL instance
+def read():
   cur.execute('''SELECT * FROM students''') # execute an SQL statment
   rv = cur.fetchall() #Retreive all rows returend by the SQL statment
   Results=[]
@@ -42,6 +36,26 @@ def read(): # Name of the method
     Result['Email']=row[1]
     Result['ID']=row[2]
     Results.append(Result)
+  return Results
+
+@app.route("/add") #Add Student
+def add():
+  name = request.args.get('name')
+  email = request.args.get('email')
+  
+  insert(name,email)
+  
+
+  
+
+@app.route("/hello") #Add Student
+def hello():
+  return '{"Server":"Running"}'
+  
+@app.route("/") #Default - Show Data
+def read_all(): # Name of the method
+  
+  Results = read()
   response={'Results':Results, 'count':len(Results)}
   ret=app.response_class(
     response=json.dumps(response),
